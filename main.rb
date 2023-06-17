@@ -20,3 +20,23 @@ def build_web_page(_all_data)
   # Analizar la respuesta JSON obtenida del cuerpo de la respuesta
   @all_data = JSON.parse(response.body)
   puts @all_data.class
+  puts('Requerimiento retorno de resultados, (se muestra el primero)')
+  puts @all_data.first(1)
+  photos = @all_data['photos'].map { |x| x['img_src'] }
+  f = File.new('nasafotos.html', 'w+')
+  f.write('<p>A continuación, verás 26 fotos del planeta  Marte,tomadas por distintas camaras<p>?n')
+  f.write("<html>\n<head>\n</head>\n<body>\n<ul>\n")
+  photos.each do |photo|
+    f.write("\n\t<li><img src='#{photo}'><li>")
+  end
+  f.write("\n</ul>\n</body>\n</html>")
+end
+build_web_page(@all_data)
+
+# Crear un método photos_count que reciba el hash de respuesta y devuelva un nuevo
+# hash con el nombre de la cámara y la cantidad de fotos
+def photos_count(_all_data)
+  @all_data['photos'].map { |x| x['camera']['name'] }.group_by { |x| x }.map { |k, v| [k, v.count] }
+end
+puts('A continuación, el numero de fotos de Marte, asociadas a cada camara')
+print photos_count(@all_data).to_h
